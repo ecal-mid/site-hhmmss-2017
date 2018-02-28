@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Test</title>
+    <link rel="stylesheet" type="text/css" href="css/hhmmss.css" media="all"/>
+    <script src="libraries/p5.js" type="text/javascript"></script>
+
+
+    <script src="libraries/p5.dom.js" type="text/javascript"></script>
+    <script src="libraries/p5.sound.js" type="text/javascript"></script>
+
+
+    <style> body {padding: 0; margin: 0;} canvas {vertical-align: top;} </style>
+  </head>
+  <body>
+    <script src="libraries/hhmmss.js" type="text/javascript"></script>
+    <script type="text/javascript">
+      var hhmmss = new HHMMSS({
+      type: "horizontal",
+      horizontalAlign: "hcenter",
+      verticalAlign: "vcenter",
+      size: "small",
+      invert: true,
+      sleepTime: 2000
+      });
+    </script>
+    <script src="myVariables.js" type="text/javascript"></script>
+    <script src="mountain.js" type="text/javascript"></script>
+    <script src="sketch.js" type="text/javascript"></script>
+  </body>
+</html>

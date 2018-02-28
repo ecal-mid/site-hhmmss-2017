@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>moving_path</title>
+  <script src="three.min.js"></script>
+  <script src="stats.min.js"></script>
+
+  <script type="text/javascript">
+  function startTime()
+  {
+    var today=new Date();
+    var h=today.getHours();
+    var m=today.getMinutes();
+    var s=today.getSeconds();
+    // add a zero in front of numbers<10
+    m=checkTime(m);
+    s=checkTime(s);
+    document.getElementById('txt').innerHTML=h+":"+m
+    t=setTimeout('startTime()',500);
+  }
+  function checkTime(i)
+  {
+    if (i<10)
+    {
+      i="0" + i;
+    }
+    return i;
+  }
+</script>
+
+<script id="vertexShader" type="x-shader/x-vertex">
+varying vec3 pos;
+varying float rectIndex;
+uniform float PI;
+uniform float rot;
+varying vec2 f_uv;
+void main()	{
+  f_uv = uv;
+  vec3 center = vec3(position.xy, 0.0);
+
+  rectIndex = normal.x;
+  float vIndex = position.z;
+  float angle = ((PI * 2.0) / 4.0) * vIndex - (PI * 0.25) + rot + rectIndex * 0.05;
+  float r = 20.0 + ((sin(normal.x * 0.1) + 1.0) * 0.5) * 30.0;
+
+  vec3 rect = vec3(0.0, 0.0, 0.0);
+  rect.x = cos(angle) * r;
+  rect.y = sin(angle) * r;
+
+  vec3 interPos = center + rect;
+  vec4 outPos = projectionMatrix * modelViewMatrix * vec4 (interPos.xy, 0.0, 1.0);
+
+  pos = vec3(position.xy, 0.0);
+  gl_Position = outPos;
+}
+</script>
+
+<script id="fragmentShader" type="x-shader/x-fragment">
+varying float rectIndex;
+varying vec3 pos;
+varying vec2 f_uv;
+uniform float numRect;
+uniform float sec;
+uniform vec2 screen;
+uniform float r;
+uniform float g;
+uniform float b;
+uniform float minute;
+
+void main()	{
+  float secOffset = (rectIndex / numRect) * 60000.0;
+  float a = 1.0;
+
+  // if (secOffset > sec) {
+  //   a = 0.0;
+  // }
+
+  if (secOffset*0.5 > sec && sec < 30000.0) {
+    a = 0.0;
+  }
+
+  if (secOffset*0.5 > 60000.0 - sec && sec > 30000.0 ) {
+    a = 0.0;
+  }
+
+  float rV = ((sin(rectIndex * 0.1 + (sec * 0.002)) + 1.0) * r*0.5);
+  float gV = ((sin(rectIndex * 0.1 + (sec * 0.002)) + 1.0) * g*0.5);
+  float bV = ((sin(rectIndex * 0.1 + (sec * 0.002)) + 1.0) * b*0.5);
+
+  vec2 delta = vec2(0.5, 0.5) - f_uv;
+  float dist = length(delta);
+
+  float aRect = 1.0;
+
+
+    float aCircle;
+    if (mod(minute,2.0) == 1.0 ){
+   aCircle = smoothstep(0.5, 0.4, dist);}
+  else {
+    aCircle = 1.0;
+    // aRect *= smoothstep(0.4, 0.3, abs(delta.x));
+    // aRect *= smoothstep(0.4, 0.3, abs(delta.y));
+    aCircle = smoothstep(0.7, 0.6, dist);
+  }
+
+
+  gl_FragColor = vec4(rV, gV, bV, a * aCircle * aRect);
+}
+
+</script>
+
+<style>
+
+@font-face {
+  font-family:"Plain";
+  src:url('Plain-Medium.woff');
+}
+html, body{
+  font-family:"Plain";
+  margin:0;
+  overflow: hidden;
+  cursor: none;
+}
+#block{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+}
+
+
+#txt {
+  margin:0;
+  font-size:20vw;
+  letter-spacing:2vw;
+  /* filter : blur(1px); */
+  position: absolute;
+  left : 50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  z-index: 100;
+  display:inline-block;
+}
+</style>
+</head>
+
+
+<body onload="startTime()">
+  <div id="block">
+    <h1 id="txt"></h1>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
